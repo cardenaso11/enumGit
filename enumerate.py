@@ -38,7 +38,7 @@ class Project:
             return self._cachedUsers
         else:
             geturl = 'https://api.github.com/repos/{owner}/{name}/contributors'.format(owner = self.owner.username, name = self.name)
-            print(geturl)
+            # print(geturl)
             with R.urlopen(geturl) as remot:
                 resp = json.loads(remot.read())
                 usersStr = map(lambda x: x["login"], resp)
@@ -52,7 +52,7 @@ def getProjects(self, cache : bool) -> {Project}:
             return self._cachedProjects
         else:
             geturl = 'https://api.github.com/users/{user}/repos?type=owner'.format(user = self.username)
-            print(geturl)
+            # print(geturl)
             with R.urlopen(geturl) as remot:
                 resp = json.loads(remot.read())
                 projectsStr = map(lambda x: x["name"], resp)
@@ -62,11 +62,16 @@ def getProjects(self, cache : bool) -> {Project}:
                 return projects
 User.getProjects = getProjects
 
-def recursivelyTraverse(seedUser : User) -> {User}:
+def recursivelyTraverse(seedUser : User) -> [User]:
     currentUser = seedUser
-    currentGeneration = set(I.chain(*[project.getUsers(False) for project in seedUser.getProjects(False)]))
-    yield currentGeneration
-    # map(lambda x: yield from recursivelyTraverse(x), currentGeneration) apparently this doesnt work
-    for x in currentGeneration: #TODO: make this recurse more effeciently
-        yield from recursivelyTraverse(x)
+    traversedUsers = {seedUser}
+    currentGeneration = set(I.chain(*[project.getUsers(False) for project in currentUser.getProjects(False)]))
 
+    while True:
+        yield from currentGeneration
+        for x in currentGeneration: #TODO: make this recurse more effeciently
+            if x in traversedUsers:
+                continue
+            traversedUsers.add(x)
+            currentUser = x
+            currentGeneration = set(I.chain(*[project.getUsers(False) for project in currentUser.getProjects(False)]))
