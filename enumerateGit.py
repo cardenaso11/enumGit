@@ -35,7 +35,7 @@ class User:
 
     def getPublicRSAKey(self, cache : bool, **kwargs):
         geturl = 'https://api.github.com/users/{user}/keys'.format(user = self.username)
-        if kwargs["clientID"] and kwargss["clientSecret"]:
+        if "clientID" in kwargs and "clientSecret" in kwargs:
             geturl += "?client_id={id}&client_secret={secret}"
             geturl = geturl.format(id = kwargs["clientID"], secret = kwargs["clientSecret"])
         with R.urlopen(geturl) as remot:
@@ -65,7 +65,7 @@ class Project:
             return self._cachedUsers
         else:
             geturl = 'https://api.github.com/repos/{owner}/{name}/contributors'.format(owner = self.owner.username, name = self.name)
-        if kwargs["clientID"] and kwargss["clientSecret"]:
+        if "clientID" in kwargs and "clientSecret" in kwargs:
             geturl += "?client_id={id}&client_secret={secret}"
             geturl = geturl.format(id = kwargs["clientID"], secret = kwargs["clientSecret"])
         # print(geturl)
@@ -82,7 +82,7 @@ def getProjects(self, cache : bool) -> {Project}:
             return self._cachedProjects
         else:
             geturl = 'https://api.github.com/users/{user}/repos?type=owner'.format(user = self.username)
-            if kwargs["clientID"] and kwargss["clientSecret"]:
+            if "clientID" in kwargs and "clientSecret" in kwargs:
                 geturl += "?client_id={id}&client_secret={secret}"
                 geturl = geturl.format(id = kwargs["clientID"], secret = kwargs["clientSecret"])
             # print(geturl)
